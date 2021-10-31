@@ -10,7 +10,7 @@ function sleep(ms) {
 }
 
 // elevator full capacity operation
-function checkIfCapacityExceeded(passMap, startRange, endRange, isEveningHours) {
+function checkIfCapacityExceeded(passMap, startRange, endRange, isEveningHours=false) {
     let curPass = 0;
     let max = 0;
     for (let i = startRange; i <= endRange; i++) {
@@ -47,23 +47,34 @@ function checkIfCapacityExceeded(passMap, startRange, endRange, isEveningHours) 
 }
 
 // new passengers enter the lift
-function addNewPassengers(passMap, startRange, endRange) {
+function addNewPassengers(passMap, startRange, endRange, curFloor) {
     for (let i = startRange; i <= endRange; i++) {
+        if(i==curFloor){
+            continue;
+        }
         passMap[i] += Math.floor(Math.random() * 20);
+    }
+    if(curFloor == 0){
+        return;
     }
     passMap[0] += Math.floor(Math.random() * 20);
 }
 
 
-function operateSingleElevator(direction, startRange, endRange, passMap, isMorningHours, isEveningHours) {
+function operateSingleElevator(direction, startRange, endRange, passMap, isMorningHours, isEveningHours, tripNumber) {
 
+    if (tripNumber == 20) {
+        return;
+    }
+    console.log('Trip Number ' + tripNumber);
+    tripNumber++;
 
     if (direction == 0) {
         console.log('Floor ' + 0);
         console.log('Dropped off ' + passMap[0] + ' passengers at floor ' + 0);
         sleep(8000)
         passMap[0] = 0;
-        addNewPassengers(passMap);
+        addNewPassengers(passMap, startRange, endRange, 0);
         if (!isMorningHours) {
             checkIfCapacityExceeded(passMap, startRange, endRange);
         }
@@ -74,7 +85,7 @@ function operateSingleElevator(direction, startRange, endRange, passMap, isMorni
             console.log('Dropped off ' + passMap[curFloor] + ' passengers at floor ' + curFloor);
             sleep(8000)
             passMap[curFloor] = 0;
-            addNewPassengers(passMap, startRange, endRange);
+            addNewPassengers(passMap, startRange, endRange, curFloor);
 
             if (!isMorningHours) {
                 checkIfCapacityExceeded(passMap, startRange, endRange);
@@ -87,10 +98,10 @@ function operateSingleElevator(direction, startRange, endRange, passMap, isMorni
             console.log('Dropped off ' + passMap[curFloor] + ' passengers at floor ' + curFloor);
             sleep(8000);
             passMap[curFloor] = 0;
-            addNewPassengers(passMap, startRange, endRange);
-            operateSingleElevator(0, startRange, endRange, passMap, true, false);
+            addNewPassengers(passMap, startRange, endRange, curFloor);
+            operateSingleElevator(0, startRange, endRange, passMap, true, false, tripNumber);
         } else {
-            operateSingleElevator(1, endRange, startRange, passMap, false, false);
+            operateSingleElevator(1, endRange, startRange, passMap, false, false, tripNumber);
         }
 
     }
@@ -101,7 +112,7 @@ function operateSingleElevator(direction, startRange, endRange, passMap, isMorni
         console.log('Dropped off ' + passMap[startRange] + ' passengers at floor ' + startRange);
         sleep(8000);
         passMap[startRange] = 0;
-        addNewPassengers(passMap, startRange, endRange);
+        addNewPassengers(passMap, endRange, startRange, startRange);
         if (!isEveningHours) {
             checkIfCapacityExceeded(passMap, endRange, startRange);
         }
@@ -112,7 +123,7 @@ function operateSingleElevator(direction, startRange, endRange, passMap, isMorni
             console.log('Dropped off ' + passMap[curFloor] + ' passengers at floor ' + curFloor);
             sleep(8000);
             passMap[curFloor] = 0;
-            addNewPassengers(passMap, startRange, endRange);
+            addNewPassengers(passMap, endRange, startRange, curFloor);
             if (!isEveningHours) {
                 checkIfCapacityExceeded(passMap, endRange, startRange);
             }
@@ -124,19 +135,19 @@ function operateSingleElevator(direction, startRange, endRange, passMap, isMorni
             console.log('Dropped off ' + passMap[0] + ' passengers at floor ' + 0);
             sleep(8000);
             passMap[0] = 0;
-            addNewPassengers(passMap, startRange, endRange);
+            addNewPassengers(passMap, endRange, startRange, 0);
             // go the floor with most passenger requests
-            checkIfCapacityExceeded(passMap, endRange, startRange);
-            operateSingleElevator(1, startRange, endRange, passMap, false, true);
+            checkIfCapacityExceeded(passMap, endRange, startRange, true);
+            operateSingleElevator(1, startRange, endRange, passMap, false, true, tripNumber);
         } else {
-            operateSingleElevator(0, endRange, startRange, passMap, false, false);
+            operateSingleElevator(0, endRange, startRange, passMap, false, false, tripNumber);
         }
 
     }
 
 }
 
-function runSingleElevator(direction, startRange, endRange, isMorningHours, isEveningHours) {
+function runSingleElevator(direction, startRange, endRange, isMorningHours, isEveningHours, tripNumber) {
     let passMap = {
 
     }
@@ -144,7 +155,7 @@ function runSingleElevator(direction, startRange, endRange, isMorningHours, isEv
     for (let i = 1; i <= 4; i++) {
         passMap[i] = 0;
     }
-    operateSingleElevator(direction, startRange, endRange, passMap, isMorningHours, isEveningHours);
+    operateSingleElevator(direction, startRange, endRange, passMap, isMorningHours, isEveningHours, tripNumber);
 }
 
 
@@ -153,8 +164,8 @@ function runAll() {
     let numOfFloors = 8;
     let numLifts = 2;
 
-    let numOfFloorsPerLift = numOfFloors/numLifts;
-    runSingleElevator(0, 1, 4, false, false);
+    let numOfFloorsPerLift = numOfFloors / numLifts;
+    runSingleElevator(1, 4, 1, false, true, 0);
 
 
 }
