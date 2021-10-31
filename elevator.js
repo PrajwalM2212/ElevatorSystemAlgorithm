@@ -60,6 +60,15 @@ function addNewPassengers(passMap, startRange, endRange, curFloor) {
     passMap[0] += Math.floor(Math.random() * 20);
 }
 
+/*
+direction - 0 means go up and 1 means go down
+startRange - The starting floor that the lift services
+endRange - The ending floor that the lift services
+passMap - The map that contains number of passengers per floor
+isMorningHours - is morning trip going on 
+isEveningHours - is evening trip going on 
+tripNumber - The number of trips currently executed
+*/
 
 function operateSingleElevator(direction, startRange, endRange, passMap, isMorningHours, isEveningHours, tripNumber) {
 
@@ -161,11 +170,26 @@ function runSingleElevator(direction, startRange, endRange, isMorningHours, isEv
 
 function runAll() {
 
-    let numOfFloors = 8;
-    let numLifts = 2;
+    let numOfFloors = 200;
+    let numLifts = 50;
 
     let numOfFloorsPerLift = numOfFloors / numLifts;
-    runSingleElevator(1, 4, 1, false, true, 0);
+
+    // Other possible combinations
+    // Note the order of start and end floors when in up and down direction
+    // up direction during morning rush hours
+    // runSingleElevator(0, 1, 4, true, false, 0);
+    // up direction during normal hours
+    // runSingleElevator(0, 1, 4, false, false, 0);
+    // down direction during normal hours
+    // runSingleElevator(1, 4, 1, false, false, 0);
+    // down direction during rush hours
+    // runSingleElevator(1, 4, 1, false, true, 0);
+
+    runSingleElevator(0, 1, 4, false, false, 0);
+
+
+    // Add more lifts
 
 
 }
